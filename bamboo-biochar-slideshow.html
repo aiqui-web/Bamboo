@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bamboo for Charcoal & Biochar — Full Review</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bamboo: #4a7c59;
+  --bamboo-light: #6fa882;
+  --bamboo-pale: #e8f2ec;
+  --charcoal: #1a1a1a;
+  --charcoal-mid: #2d2d2d;
+  --ash: #f0ede8;
+  --smoke: #8a8a8a;
+  --gold: #c9a84c;
+  --white: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--charcoal);
+  color: var(--white);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+.slideshow { width: 100vw; height: 100vh; position: relative; }
+
+.slide { position: absolute; inset: 0; display: none; }
+.slide.active { display: flex; }
+
+.nav {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 100;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.nav button {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav button:hover { background: var(--bamboo); border-color: var(--bamboo); }
+
+.slide-counter {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 2px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.progress-dots { display: flex; gap: 5px; flex-wrap: wrap; max-width: 360px; justify-content: center; }
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.dot.active { background: var(--bamboo-light); width: 16px; border-radius: 3px; }
+
+.key-hint {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 1px;
+  z-index: 100;
+}
+
+/* ── SLIDE LAYOUTS ── */
+
+.slide-title {
+  background: var(--charcoal);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide-title::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(74,124,89,0.25) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 50%, rgba(201,168,76,0.1) 0%, transparent 50%);
+}
+
+.bamboo-bg {
+  position: absolute;
+  right: -60px;
+  top: 0; bottom: 0;
+  width: 45%;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  opacity: 0.12;
+}
+
+.bamboo-stalks { display: flex; gap: 18px; align-items: stretch; padding: 0 20px; }
+
+.stalk {
+  width: 28px;
+  background: linear-gradient(to right, #6fa882, #4a7c59, #3a6347);
+  border-radius: 14px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.stalk::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 20%;
+  height: 2px;
+  background: rgba(0,0,0,0.3);
+  box-shadow: 0 80px 0 rgba(0,0,0,0.3), 0 160px 0 rgba(0,0,0,0.3), 0 240px 0 rgba(0,0,0,0.3), 0 320px 0 rgba(0,0,0,0.3);
+}
+
+.title-content { position: relative; z-index: 2; max-width: 720px; padding: 40px; }
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--bamboo-light);
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.title-main {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 4.6vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  color: var(--white);
+}
+
+.title-sub {
+  font-size: 1.02rem;
+  color: rgba(255,255,255,0.5);
+  font-weight: 300;
+  margin-bottom: 36px;
+  line-height: 1.6;
+}
+
+.title-meta { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; }
+.meta-item { text-align: center; }
+.meta-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--smoke); display: block; margin-bottom: 4px; }
+.meta-value { font-size: 0.85rem; color: rgba(255,255,255,0.7); font-weight: 500; }
+
+.accent-line { width: 60px; height: 3px; background: linear-gradient(to right, var(--bamboo), var(--gold)); margin: 0 auto 28px; border-radius: 2px; }
+
+.slide-standard {
+  background: var(--charcoal);
+  flex-direction: column;
+  padding: 50px 76px;
+  justify-content: center;
+}
+
+.slide-number {
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  color: var(--bamboo-light);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.slide-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3.1vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  color: var(--white);
+}
+.slide-heading span { color: var(--bamboo-light); }
+
+.slide-rule { width: 40px; height: 2px; background: var(--bamboo); margin-bottom: 26px; border-radius: 1px; }
+
+.slide-body {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.7);
+  max-width: 720px;
+  margin-bottom: 26px;
+}
+
+.cards { display: grid; gap: 14px; margin-top: 6px; }
+.cards-2 { grid-template-columns: 1fr 1fr; }
+.cards-3 { grid-template-columns: 1fr 1fr 1fr; }
+.cards-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right, var(--bamboo), transparent); }
+.card-icon { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+.card-title { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--bamboo-light); margin-bottom: 6px; }
+.card-body { font-size: 0.83rem; color: rgba(255,255,255,0.6); line-height: 1.55; }
+
+.stat-block { display: flex; gap: 36px; margin-top: 18px; flex-wrap: wrap; }
+.stat { text-align: left; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 2.6rem; font-weight: 900; color: var(--bamboo-light); line-height: 1; }
+.stat-label { font-size: 0.73rem; color: var(--smoke); margin-top: 4px; letter-spacing: 0.5px; max-width: 150px; line-height: 1.4; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; margin-top: 14px; }
+.col-label { font-size: 0.68rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--bamboo-light); font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+.bullet-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.bullet-list li { font-size: 0.88rem; color: rgba(255,255,255,0.7); line-height: 1.5; padding-left: 18px; position: relative; }
+.bullet-list li::before { content: '→'; position: absolute; left: 0; color: var(--bamboo-light); font-size: 0.78rem; }
+
+.compare-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.82rem; }
+.compare-table th { text-align: left; padding: 9px 14px; font-size: 0.66rem; letter-spacing: 1.6px; text-transform: uppercase; color: var(--smoke); border-bottom: 1px solid rgba(255,255,255,0.08); }
+.compare-table td { padding: 10px 14px; color: rgba(255,255,255,0.7); border-bottom: 1px solid rgba(255,255,255,0.05); line-height: 1.4; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child { color: var(--bamboo-light); font-weight: 500; }
+
+.highlight-box {
+  background: rgba(74,124,89,0.12);
+  border: 1px solid rgba(111,168,130,0.25);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-top: 18px;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  position: relative;
+}
+.highlight-box::before { content: '"'; font-family: 'Playfair Display', serif; font-size: 2.8rem; color: var(--bamboo); position: absolute; top: -8px; left: 14px; line-height: 1; }
+
+.steps { display: flex; gap: 0; margin-top: 22px; align-items: flex-start; }
+.step { flex: 1; text-align: center; position: relative; }
+.step:not(:last-child)::after { content: ''; position: absolute; top: 20px; right: -1px; width: 50%; height: 1px; background: linear-gradient(to right, var(--bamboo), transparent); }
+.step:not(:first-child)::before { content: ''; position: absolute; top: 20px; left: -1px; width: 50%; height: 1px; background: linear-gradient(to left, var(--bamboo), transparent); }
+.step-circle { width: 40px; height: 40px; border-radius: 50%; background: rgba(74,124,89,0.2); border: 1px solid var(--bamboo); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1rem; }
+.step-name { font-size: 0.76rem; font-weight: 600; color: var(--white); margin-bottom: 6px; letter-spacing: 0.5px; }
+.step-desc { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.4; padding: 0 8px; }
+
+.yield-bars { display: flex; flex-direction: column; gap: 11px; margin-top: 18px; }
+.yield-row { display: flex; align-items: center; gap: 14px; }
+.yield-name { font-size: 0.76rem; color: rgba(255,255,255,0.6); min-width: 170px; text-align: right; }
+.yield-track { flex: 1; height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; }
+.yield-fill { height: 100%; border-radius: 5px; background: linear-gradient(to right, var(--bamboo), var(--bamboo-light)); transition: width 1s ease; }
+.yield-pct { font-size: 0.76rem; font-weight: 600; color: var(--bamboo-light); min-width: 42px; }
+
+.slide-covid { background: #0d0d0d; }
+
+.slide-conclusion {
+  background: var(--charcoal-mid);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.slide-conclusion::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 60%, rgba(74,124,89,0.2) 0%, transparent 65%); }
+
+.section-pill {
+  display: inline-block;
+  background: rgba(74,124,89,0.2);
+  border: 1px solid rgba(111,168,130,0.3);
+  color: var(--bamboo-light);
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+</style>
+</head>
+<body>
+
+<p class="key-hint">← → or click arrows to navigate</p>
+
+<div class="slideshow" id="slideshow">
+
+  <!-- SLIDE 1: TITLE -->
+  <div class="slide slide-title active" id="slide-1">
+    <div class="bamboo-bg">
+      <div class="bamboo-stalks">
+        <div class="stalk" style="height:110%; margin-top:-5%"></div>
+        <div class="stalk" style="height:95%; margin-top:2%"></div>
+        <div class="stalk" style="height:105%; margin-top:-3%"></div>
+        <div class="stalk" style="height:90%; margin-top:5%"></div>
+        <div class="stalk" style="height:100%"></div>
+      </div>
+    </div>
+    <div class="title-content">
+      <p class="eyebrow">Research Presentation</p>
+      <h1 class="title-main">Bamboo for Producing<br>Charcoal & Biochar</h1>
+      <div class="accent-line"></div>
+      <p class="title-sub">A full review of versatile applications for bamboo-derived<br>carbon materials in environmental, agricultural and industrial use</p>
+      <div class="title-meta">
+        <div class="meta-item">
+          <span class="meta-label">Published in</span>
+          <span class="meta-value">Biomass Conversion & Biorefinery</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Year</span>
+          <span class="meta-value">2023</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Authors</span>
+          <span class="meta-value">Chaturvedi, Singhwane, Dhangar, Verma et al. (CSIR-AMPRI, India)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: ABSTRACT AT A GLANCE -->
+  <div class="slide slide-standard" id="slide-2">
+    <p class="slide-number">01 — Abstract</p>
+    <h2 class="slide-heading">Two products,<br><span>one source plant</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">This review surveys how bamboo — the world's fastest-growing plant — is converted into charcoal and biochar through pyrolysis, and maps the wide range of yields, properties and applications reported across the literature.</p>
+    <div class="stat-block">
+      <div class="stat">
+        <div class="stat-num">24.6–74.3%</div>
+        <p class="stat-label">Reported charcoal yield range across bamboo species</p>
+      </div>
+      <div class="stat">
+        <div class="stat-num">32–80%</div>
+        <p class="stat-label">Reported biochar yield range across bamboo species</p>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4× / 10×</div>
+        <p class="stat-label">Bamboo charcoal's absorption rate / surface area vs regular charcoal</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: THE PROBLEM -->
+  <div class="slide slide-standard" id="slide-3">
+    <p class="slide-number">02 — Introduction</p>
+    <h2 class="slide-heading">Three big problems.<br><span>One plant.</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">The world faces mounting challenges in water pollution, soil degradation, and unmanageable waste. This review asks: can a single, fast-growing plant offer sustainable solutions to all three?</p>
+    <div class="cards cards-3">
+      <div class="card">
+        <span class="card-icon">💧</span>
+        <p class="card-title">Water Pollution</p>
+        <p class="card-body">Industrial dyes, heavy metals, and chemical contaminants are polluting water sources globally.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌱</span>
+        <p class="card-title">Soil Degradation</p>
+        <p class="card-body">Agricultural land is losing fertility due to nutrient depletion, chemical use, and climate stress.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🗑️</span>
+        <p class="card-title">Plastic Waste</p>
+        <p class="card-body">COVID-19 triggered a surge in single-use plastic waste — masks, gloves, syringes — with no clear solution.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: WHY BAMBOO -->
+  <div class="slide slide-standard" id="slide-4">
+    <p class="slide-number">03 — Why Bamboo</p>
+    <h2 class="slide-heading">The world's fastest<br><span>growing plant</span></h2>
+    <div class="slide-rule"></div>
+    <div class="two-col">
+      <div>
+        <p class="slide-body" style="margin-bottom:0">Bamboo is not just fast-growing — it's exceptionally practical as a raw material. Unlike wood, it needs no replanting after harvest, tolerates almost any climate, and produces far more biomass per hectare.</p>
+        <div class="stat-block" style="margin-top:22px">
+          <div class="stat">
+            <div class="stat-num">60cm</div>
+            <p class="stat-label">Maximum daily growth rate</p>
+          </div>
+          <div class="stat">
+            <div class="stat-num">3–4</div>
+            <p class="stat-label">Years to maturity vs ~20 for wood</p>
+          </div>
+          <div class="stat">
+            <div class="stat-num">30%</div>
+            <p class="stat-label">More oxygen released than trees</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="col-label">Key Advantages</p>
+        <ul class="bullet-list">
+          <li>Grows in poor, eroding soil where other plants fail</li>
+          <li>Root system regenerates after harvest — no replanting needed</li>
+          <li>Tolerates temperatures from −28°C to 38°C</li>
+          <li>Needs no fertilizers or pesticides</li>
+          <li>Absorbs up to 12 tonnes of CO₂ per hectare</li>
+          <li>Cheaper, lighter, and stronger than steel per weight</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: BAMBOO VS WOOD & STEEL -->
+  <div class="slide slide-standard" id="slide-5">
+    <p class="slide-number">04 — Why Bamboo</p>
+    <h2 class="slide-heading">How bamboo compares<br><span>to wood and steel</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">Beyond growth speed, bamboo's raw material properties make it a genuine substitute for conventional building and feedstock materials.</p>
+    <div class="cards cards-3">
+      <div class="card">
+        <span class="card-icon">🏗️</span>
+        <p class="card-title">Stronger Than It Looks</p>
+        <p class="card-body">Compressive strength exceeds wood and brick, and tensile strength is notable compared to steel — at a fraction of the weight.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧪</span>
+        <p class="card-title">Richer Chemistry</p>
+        <p class="card-body">Bamboo contains more silica, charcoal-forming compounds, and alkaline extractives than wood, shaping how it chars and carbonizes.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⏱️</span>
+        <p class="card-title">Faster to Harvest</p>
+        <p class="card-body">Matures in 3–4 years versus roughly 20 for wood, and can be picked annually without replanting.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: CHARCOAL VS BIOCHAR -->
+  <div class="slide slide-standard" id="slide-6">
+    <p class="slide-number">05 — The Two Materials</p>
+    <h2 class="slide-heading">Charcoal vs <span>Biochar</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">Both come from pyrolysis, but the International Biochar Initiative treats them as distinct materials with different feedstocks, structures, and uses.</p>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Property</th><th>Charcoal</th><th>Biochar</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Definition</td><td>Dark, porous carbon made from vegetable or animal material in the absence of air</td><td>Compacted material from thermochemical reduction of biomass in an oxygen-limited environment</td></tr>
+        <tr><td>Main feedstock</td><td>Wood-based biomass (wood, peat, coconut husk, petroleum)</td><td>Any biomass — plant residue, agricultural waste, wood chips</td></tr>
+        <tr><td>Porosity</td><td>Less porous, smaller surface area</td><td>Highly porous — a few ounces can match the surface area of a football field</td></tr>
+        <tr><td>Typical pH</td><td>9–11 once activated</td><td>4.6–9.3, depending on feedstock and temperature</td></tr>
+        <tr><td>Stability</td><td>Less stable carbon, breaks down faster in soil</td><td>More stable, persists in soil far longer</td></tr>
+        <tr><td>Primary role</td><td>Adsorption, fuel, filtration</td><td>Soil amendment, carbon sequestration</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SLIDE 7: PYROLYSIS PROCESS -->
+  <div class="slide slide-standard" id="slide-7">
+    <p class="slide-number">06 — The Process</p>
+    <h2 class="slide-heading">How bamboo becomes<br><span>carbon</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">Pyrolysis is the key process — heating organic material at 250–900°C in an <strong style="color:rgba(255,255,255,0.9)">oxygen-free environment</strong>. Without oxygen it cannot burn; instead it breaks down into useful carbon-rich materials.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-circle">🎋</div>
+        <p class="step-name">Raw Bamboo</p>
+        <p class="step-desc">Harvested at 3–6 years. Cut and pre-treated.</p>
+      </div>
+      <div class="step">
+        <div class="step-circle">🔥</div>
+        <p class="step-name">Pyrolysis</p>
+        <p class="step-desc">Heated at 250–900°C with no oxygen present</p>
+      </div>
+      <div class="step">
+        <div class="step-circle">⚗️</div>
+        <p class="step-name">Breakdown</p>
+        <p class="step-desc">Cellulose, lignin and hemicellulose decompose</p>
+      </div>
+      <div class="step">
+        <div class="step-circle">🪨</div>
+        <p class="step-name">Charcoal / Biochar</p>
+        <p class="step-desc">Solid carbon product with porous structure</p>
+      </div>
+      <div class="step">
+        <div class="step-circle">✅</div>
+        <p class="step-name">Activation</p>
+        <p class="step-desc">Optional treatment to enhance surface area</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: TEMPERATURE EFFECTS -->
+  <div class="slide slide-standard" id="slide-8">
+    <p class="slide-number">07 — The Process</p>
+    <h2 class="slide-heading">Why temperature is<br><span>the key variable</span></h2>
+    <div class="slide-rule"></div>
+    <div class="two-col">
+      <div>
+        <p class="col-label">Low Temperature (&lt;500°C)</p>
+        <ul class="bullet-list">
+          <li>Combustible volatile compounds stay trapped in the pores instead of escaping</li>
+          <li>These volatiles act as fuel when reheated, making the char combustible</li>
+          <li>More O- and H-containing functional groups remain</li>
+          <li>Better suited to adsorbing hydrophilic, polar pollutants</li>
+        </ul>
+      </div>
+      <div>
+        <p class="col-label">High Temperature (&gt;500°C)</p>
+        <ul class="bullet-list">
+          <li>Nearly all volatiles evaporate, leaving a pure carbon skeleton</li>
+          <li>Far less combustible — there is no leftover fuel inside the pores</li>
+          <li>Strong C–C covalent bonds give excellent fire resistance</li>
+          <li>Higher aromaticity and low polarity suit nonpolar pollutant removal</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: ENVIRONMENTAL BENEFITS OVERVIEW -->
+  <div class="slide slide-standard" id="slide-9">
+    <p class="slide-number">08 — Environmental Benefits</p>
+    <h2 class="slide-heading">What biochar and charcoal<br><span>give back to the environment</span></h2>
+    <div class="slide-rule"></div>
+    <div class="cards cards-4">
+      <div class="card">
+        <span class="card-icon">🌍</span>
+        <p class="card-title">Carbon Capture</p>
+        <p class="card-body">Sequesters carbon in soil for thousands of years; proposed as a large-scale offset for greenhouse gas emissions.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌾</span>
+        <p class="card-title">Soil Enrichment</p>
+        <p class="card-body">Raises soil pH, boosts cation exchange capacity, and improves nutrient availability for plants.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">💨</span>
+        <p class="card-title">Lower Emissions</p>
+        <p class="card-body">Reduces methane and nitrous oxide release from soil — two especially potent greenhouse gases.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧪</span>
+        <p class="card-title">Contaminant Control</p>
+        <p class="card-body">Adsorbs heavy metals and organic pollutants, lowering their bioavailability in soil and water.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: BAMBOO CHARCOAL HISTORY/NANOSTRUCTURE -->
+  <div class="slide slide-standard" id="slide-10">
+    <p class="slide-number">09 — Bamboo Charcoal</p>
+    <h2 class="slide-heading">A material with<br><span>centuries of use</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">Bamboo charcoal's distinctive qualities have been put to use since 1486 AD. Modern materials science has since revealed why it behaves the way it does at the nanoscale.</p>
+    <div class="stat-block">
+      <div class="stat">
+        <div class="stat-num">2.8 eV</div>
+        <p class="stat-label">Band gap of carbon nanostructures annealed at 500°C</p>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3.3 eV</div>
+        <p class="stat-label">Optical band gap of bamboo charcoal annealed at 600°C (BC-600)</p>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2</div>
+        <p class="stat-label">Distinct photoluminescent centers found, in green and yellow light</p>
+      </div>
+    </div>
+    <div class="highlight-box" style="padding-left:38px">
+      Heating bamboo stems in an argon atmosphere produces graphitic carbon nanostructures with measurable photoluminescence — turning ordinary bamboo char into a candidate material for excitation-wavelength-neutral UV-light detectors.
+    </div>
+  </div>
+
+  <!-- SLIDE 11: CHARCOAL YIELD CHART -->
+  <div class="slide slide-standard" id="slide-11">
+    <p class="slide-number">10 — Production Data</p>
+    <h2 class="slide-heading">Charcoal yield by<br><span>bamboo species</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">Yield varies significantly with species, production method, and carbonization temperature. Lignin content is the biggest driver of high yield.</p>
+    <div class="yield-bars">
+      <div class="yield-row"><span class="yield-name">Bamboo Chopsticks (waste)</span><div class="yield-track"><div class="yield-fill" style="width:74.27%"></div></div><span class="yield-pct">74.27%</span></div>
+      <div class="yield-row"><span class="yield-name">Fiber Bundle Bamboo</span><div class="yield-track"><div class="yield-fill" style="width:69.1%"></div></div><span class="yield-pct">69.10%</span></div>
+      <div class="yield-row"><span class="yield-name">Bambusa vulgaris</span><div class="yield-track"><div class="yield-fill" style="width:36%"></div></div><span class="yield-pct">36.00%</span></div>
+      <div class="yield-row"><span class="yield-name">Phyllostachys mazel</span><div class="yield-track"><div class="yield-fill" style="width:34.4%"></div></div><span class="yield-pct">34.40%</span></div>
+      <div class="yield-row"><span class="yield-name">Moso Bamboo</span><div class="yield-track"><div class="yield-fill" style="width:32.1%"></div></div><span class="yield-pct">32.10%</span></div>
+      <div class="yield-row"><span class="yield-name">Thorny Bamboo</span><div class="yield-track"><div class="yield-fill" style="width:24.6%"></div></div><span class="yield-pct">24.60%</span></div>
+    </div>
+    <p style="font-size:0.74rem; color:var(--smoke); margin-top:14px;">★ Chopstick bamboo yields highest due to elevated lignin content from prior processing</p>
+  </div>
+
+  <!-- SLIDE 12: NOTABLE CHARCOAL STUDIES I -->
+  <div class="slide slide-standard" id="slide-12">
+    <p class="slide-number">11 — Case Studies</p>
+    <h2 class="slide-heading">Notable charcoal<br><span>research, part one</span></h2>
+    <div class="slide-rule"></div>
+    <div class="cards cards-3">
+      <div class="card">
+        <span class="card-icon">🌫️</span>
+        <p class="card-title">CO₂ Adsorption</p>
+        <p class="card-body">Moso bamboo porous charcoal carbonized at 1000°C gave the best CO₂ adsorption, cutting concentration to 0.836% — outperforming commercial activated carbon at room temperature (Huang et al.).</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧫</span>
+        <p class="card-title">Sulfur Removal</p>
+        <p class="card-body">Charcoal made via two pyrolysis routes absorbed sodium sulphate at up to 2.63 g per 125 g of sample, showing bamboo's ability to pull sulfur compounds from contaminated water (Kaur et al.).</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📡</span>
+        <p class="card-title">Microwave Activation</p>
+        <p class="card-body">Phosphoric-acid activation under microwave radiation produced a 48% carbon yield faster than conventional thermal activation, with strong organic-pollutant adsorption (Liu et al.).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 13: ACTIVATED CARBON PERFORMANCE HIGHLIGHTS -->
+  <div class="slide slide-standard" id="slide-13">
+    <p class="slide-number">12 — Case Studies</p>
+    <h2 class="slide-heading">Notable charcoal<br><span>research, part two</span></h2>
+    <div class="slide-rule"></div>
+    <div class="cards cards-3">
+      <div class="card">
+        <span class="card-icon">🧴</span>
+        <p class="card-title">Pesticide Removal</p>
+        <p class="card-body">H₃PO₄/H₂O activated carbon yielded 39% with a surface area of 1196.30 m²/g, removing pesticides like FRD at up to 868.98 mg/g.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎨</span>
+        <p class="card-title">Methylene Blue Dye</p>
+        <p class="card-body">Direct physical–chemical activation at 500°C produced carbon with a 1354.42 m²/g surface area and a maximum adsorption capacity of 374.75 mg/g.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⚙️</span>
+        <p class="card-title">KOH Activation</p>
+        <p class="card-body">Among KOH, K₂CO₃, Na₂CO₃ and NaOH, KOH produced the largest surface area and most microporous structure, at an optimal KOH/carbon ratio of 4.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 14: CHARCOAL APPLICATIONS BY STUDY -->
+  <div class="slide slide-standard" id="slide-14">
+    <p class="slide-number">13 — Production Data</p>
+    <h2 class="slide-heading">Charcoal studies<br><span>at a glance</span></h2>
+    <div class="slide-rule"></div>
+    <table class="compare-table">
+      <thead><tr><th>Source / Species</th><th>Method</th><th>Application studied</th></tr></thead>
+      <tbody>
+        <tr><td>Bambusa vulgaris</td><td>Argon, 500–600°C</td><td>Amorphous carbon & fluorescence properties</td></tr>
+        <tr><td>Bamboo fiber bundles</td><td>Foil / muffle furnace, 600°C</td><td>Adsorption of sulfur-based compounds</td></tr>
+        <tr><td>Thorny bamboo</td><td>Activation at 600–900°C</td><td>Heavy metal removal from groundwater</td></tr>
+        <tr><td>Waste bamboo chopsticks</td><td>300–400°C, nitrogen</td><td>Surface & adsorption characterization</td></tr>
+        <tr><td>Gigantochloa albociliata</td><td>Mechanical kiln vs lab furnace</td><td>Commercial vs lab-prepared charcoal</td></tr>
+        <tr><td>Waste bamboo scaffolding</td><td>150°C, then 400 / 600°C</td><td>Adsorbing acidic dyes from water</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SLIDE 15: BIOCHAR YIELD CHART -->
+  <div class="slide slide-standard" id="slide-15">
+    <p class="slide-number">14 — Production Data</p>
+    <h2 class="slide-heading">Biochar yield by<br><span>bamboo species</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">Biochar yield ranges from 32–80% depending on species. As pyrolysis temperature rises, yield falls — but carbon quality and stability improve.</p>
+    <div class="yield-bars">
+      <div class="yield-row"><span class="yield-name">D. giganteus (300°C)</span><div class="yield-track"><div class="yield-fill" style="width:80%"></div></div><span class="yield-pct">80%</span></div>
+      <div class="yield-row"><span class="yield-name">D. latiflorus Munro (300°C)</span><div class="yield-track"><div class="yield-fill" style="width:48%"></div></div><span class="yield-pct">48%</span></div>
+      <div class="yield-row"><span class="yield-name">Dry Bamboo Stalks (400°C)</span><div class="yield-track"><div class="yield-fill" style="width:32%"></div></div><span class="yield-pct">32%</span></div>
+    </div>
+    <div class="highlight-box" style="padding-left:38px">
+      D. giganteus produces the most biochar (80%) because of its naturally high carbon content. Dry bamboo stalks produce the least (32%) due to lower lignin concentration.
+    </div>
+  </div>
+
+  <!-- SLIDE 16: NOTABLE BIOCHAR STUDIES -->
+  <div class="slide slide-standard" id="slide-16">
+    <p class="slide-number">15 — Case Studies</p>
+    <h2 class="slide-heading">Notable biochar<br><span>research</span></h2>
+    <div class="slide-rule"></div>
+    <div class="cards cards-2">
+      <div class="card">
+        <span class="card-icon">🎋</span>
+        <p class="card-title">D. giganteus</p>
+        <p class="card-body">Slow pyrolysis at 300–600°C gave a maximum 80% biochar yield at 300°C, with heating values comparable to wood biochar (Hernandez-Mena et al.).</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🆚</span>
+        <p class="card-title">Bamboo vs Pigeon Pea</p>
+        <p class="card-body">Bamboo biochar (BB400–BB600) yielded 32.20–21.70%, outperforming pigeon pea stalks thanks to bamboo's higher lignin content (Sahoo et al.).</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧱</span>
+        <p class="card-title">Biochar–Clay Composite</p>
+        <p class="card-body">Combining bamboo biochar with montmorillonite clay significantly improved nitrate-removal performance over unmodified biochar (Viglašová et al.).</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌿</span>
+        <p class="card-title">Bamboo Shoot Shell</p>
+        <p class="card-body">Pyrolyzing D. latiflorus shoot shells gave a maximum 48% yield at 300°C, falling to 33% as temperature rose to 500°C (Ye et al.).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 17: TOMATO CASE STUDY -->
+  <div class="slide slide-standard" id="slide-17">
+    <p class="slide-number">16 — Case Study</p>
+    <h2 class="slide-heading">Biochar in the field:<br><span>growing better tomatoes</span></h2>
+    <div class="slide-rule"></div>
+    <div class="two-col">
+      <div>
+        <p class="col-label">Setup</p>
+        <p class="slide-body" style="margin-bottom:0">Tomato plants ("Micro-Tom") were grown in sand medium with 0%, 1%, or 3% biochar added, produced at temperatures from 300–600°C (Suthar et al.).</p>
+      </div>
+      <div>
+        <p class="col-label">Findings</p>
+        <ul class="bullet-list">
+          <li>Biochar pyrolyzed at 300°C or 450°C, added at 1–3%, boosted plant growth the most</li>
+          <li>Raised Mg, NO₃, P and Ca levels in the growing medium</li>
+          <li>Higher nutrient levels were linked to better fruit quality</li>
+        </ul>
+      </div>
+    </div>
+    <div class="highlight-box" style="padding-left:38px">
+      Bamboo biochar's development conditions directly shape its soil-amendment benefits — and the quality of the fruit that grows from it.
+    </div>
+  </div>
+
+  <!-- SLIDE 18: COMPARISON - PRODUCTION -->
+  <div class="slide slide-standard" id="slide-18">
+    <p class="slide-number">17 — Comparison</p>
+    <h2 class="slide-heading">Bamboo vs other biomass:<br><span>production</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">Sahoo et al. (2021) compared biochar made from bamboo and pigeon pea stalk under identical slow-pyrolysis conditions.</p>
+    <div class="stat-block">
+      <div class="stat">
+        <div class="stat-num">32.2–27.0%</div>
+        <p class="stat-label">Bamboo biochar yield — higher lignin, lower volatiles</p>
+      </div>
+      <div class="stat">
+        <div class="stat-num">29.8–21.7%</div>
+        <p class="stat-label">Pigeon pea stalk biochar yield — consistently lower</p>
+      </div>
+      <div class="stat">
+        <div class="stat-num">81.9–85.7%</div>
+        <p class="stat-label">Carbon mass fraction reached at 600°C for both feedstocks</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 19: COMPARISON - PERFORMANCE -->
+  <div class="slide slide-standard" id="slide-19">
+    <p class="slide-number">18 — Comparison</p>
+    <h2 class="slide-heading">Bamboo vs other biomass:<br><span>performance</span></h2>
+    <div class="slide-rule"></div>
+    <div class="two-col">
+      <div>
+        <p class="col-label">vs Rice Husk Biochar</p>
+        <p class="slide-body" style="margin-bottom:0">Across pyrolysis temperatures of 200–800°C, moso bamboo biochar consistently showed higher fixed carbon, a higher heating value, and lower ash content than rice husk biochar — making it the better fuel and carbon-storage material.</p>
+      </div>
+      <div>
+        <p class="col-label">BBC-KOH for CO₂ Capture</p>
+        <p class="slide-body" style="margin-bottom:0">KOH-activated bamboo charcoal (BBC-KOH) showed strong CO₂ adsorption and proved more cost-effective than MEA-based chemical absorption for industrial carbon capture, thanks to lower investment cost and simpler operation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 20: WHY BAMBOO WINS -->
+  <div class="slide slide-standard" id="slide-20">
+    <p class="slide-number">19 — Why Bamboo Wins</p>
+    <h2 class="slide-heading">The case for<br><span>bamboo, summarized</span></h2>
+    <div class="slide-rule"></div>
+    <div class="two-col">
+      <div>
+        <p class="col-label">Growth & Economics</p>
+        <ul class="bullet-list">
+          <li>High biomass production at low management cost</li>
+          <li>Harvestable yearly for 3–5 years, unlike trees harvested every 20–50 years</li>
+          <li>Regenerates from its own root system — no replanting needed</li>
+        </ul>
+      </div>
+      <div>
+        <p class="col-label">Environmental Impact</p>
+        <ul class="bullet-list">
+          <li>Produces around 30% more oxygen than trees</li>
+          <li>Some species capture up to 12 tonnes of CO₂ per hectare</li>
+          <li>Bamboo biochar locks carbon into soil for thousands of years</li>
+          <li>Lowers methane and nitrogen emissions, improves water retention</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 21: COVID-19 -->
+  <div class="slide slide-standard slide-covid" id="slide-21">
+    <p class="slide-number">20 — COVID-19 Section</p>
+    <h2 class="slide-heading">Plastic waste from<br><span>the pandemic</span></h2>
+    <div class="slide-rule"></div>
+    <p class="slide-body">COVID-19 created a global plastic waste crisis. Hospitals, clinics, and households generated massive quantities of PPE — masks, gloves, syringes, gowns — with no clear sustainable disposal method.</p>
+    <div class="two-col" style="margin-top:4px">
+      <div>
+        <p class="col-label">The Problem</p>
+        <ul class="bullet-list">
+          <li>Coronavirus survives on plastic for up to <strong style="color:white">72 hours</strong></li>
+          <li>Burning PPE releases toxic chlorinated chemicals and microplastics</li>
+          <li>Dumping in landfill contaminates soil and oceans</li>
+          <li>Recycling is difficult due to contamination risk</li>
+        </ul>
+      </div>
+      <div>
+        <p class="col-label">The Biochar Solution</p>
+        <ul class="bullet-list">
+          <li>Pyrolysis converts plastic waste into biochar without toxic emissions</li>
+          <li>Complex hydrocarbons break down into gas, liquid, and solid char</li>
+          <li>Resulting char has carbon-sequestration properties — traps CO₂</li>
+          <li>High heating value (≈34 MJ/kg) — usable as fuel</li>
+          <li>Recycled PET bottles have even been engineered into biochar for CO₂ capture</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 22: APPLICATIONS OF CHARCOAL -->
+  <div class="slide slide-standard" id="slide-22">
+    <p class="slide-number">21 — Applications</p>
+    <h2 class="slide-heading">What bamboo charcoal<br><span>can do</span></h2>
+    <div class="slide-rule"></div>
+    <div class="cards cards-3">
+      <div class="card">
+        <span class="card-icon">💧</span>
+        <p class="card-title">Water Purification</p>
+        <p class="card-body">Porous structure traps dyes, heavy metals, pesticides, and chemical pollutants — highly effective for treating contaminated wastewater.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📡</span>
+        <p class="card-title">Electromagnetic Shielding</p>
+        <p class="card-body">High surface area and conductivity make it an effective absorber of electromagnetic waves in communication devices.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">☀️</span>
+        <p class="card-title">Solar Cell Electrodes</p>
+        <p class="card-body">Used as electrode material in Dye-Sensitized Solar Cells (DSSC). Best result achieved: 5.4% efficiency using porous activated carbon.</p>
+      </div>
+    </div>
+    <div class="highlight-box" style="padding-left:38px">
+      The key to all these uses is the same: bamboo charcoal's enormous surface area (300 m²/g) packed with millions of tiny pores that can trap and hold almost anything.
+    </div>
+  </div>
+
+  <!-- SLIDE 23: APPLICATIONS OF BIOCHAR - SOIL -->
+  <div class="slide slide-standard" id="slide-23">
+    <p class="slide-number">22 — Applications</p>
+    <h2 class="slide-heading">What bamboo biochar<br><span>does for soil</span></h2>
+    <div class="slide-rule"></div>
+    <div class="cards cards-3">
+      <div class="card">
+        <span class="card-icon">🌱</span>
+        <p class="card-title">Nutrient Release</p>
+        <p class="card-body">Acts as a slow-release fertilizer; how it releases nutrients depends on pyrolysis temperature, feedstock, and application method.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🪴</span>
+        <p class="card-title">Soil Property Enhancement</p>
+        <p class="card-body">Increases surface area, aeration, and water retention, while supporting beneficial mycorrhizal fungi and raising soil pH.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">💨</span>
+        <p class="card-title">Gas Remediation</p>
+        <p class="card-body">Removes H₂S from biogas; effective when made from pig manure, rice hulls, bamboo, sludge, or hardwood chips.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 24: APPLICATIONS OF BIOCHAR - ENVIRONMENT -->
+  <div class="slide slide-standard" id="slide-24">
+    <p class="slide-number">23 — Applications</p>
+    <h2 class="slide-heading">What bamboo biochar<br><span>does for the planet</span></h2>
+    <div class="slide-rule"></div>
+    <div class="cards cards-3">
+      <div class="card">
+        <span class="card-icon">🌍</span>
+        <p class="card-title">Greenhouse Gas Reduction</p>
+        <p class="card-body">Lowers N₂O and CH₄ emissions from soil. CO₂ accounts for more than 77% of the emissions driving climate change.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧪</span>
+        <p class="card-title">Organic Pollutant Removal</p>
+        <p class="card-body">Removes pesticides, herbicides, fungicides, and insecticides from soil via physisorption and chemisorption.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">♻️</span>
+        <p class="card-title">Plastic Waste Management</p>
+        <p class="card-body">Pyrolyzing plastic waste into biochar offers a sustainable alternative to incineration — recovering energy while cutting pollution.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 25: RECOMMENDATIONS -->
+  <div class="slide slide-standard" id="slide-25">
+    <p class="slide-number">24 — Recommendations</p>
+    <h2 class="slide-heading">Where the research<br><span>goes next</span></h2>
+    <div class="slide-rule"></div>
+    <ul class="bullet-list" style="max-width:640px; gap:14px;">
+      <li>Grow more bamboo to support both environmental and economic goals</li>
+      <li>Increase the surface area and pore prominence of activated charcoal and biochar to widen their biological applications</li>
+      <li>Sharpen focus on temperature, precursor choice, and activation method to keep improving adsorption performance</li>
+      <li>Continue developing tailored biochar techniques for new domains beyond agriculture and water treatment</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 26: CONCLUSION -->
+  <div class="slide slide-conclusion" id="slide-26">
+    <div style="position:relative; z-index:2; max-width:760px; padding:40px; text-align:center;">
+      <p class="eyebrow" style="color:var(--bamboo-light); font-size:0.75rem; letter-spacing:4px; text-transform:uppercase; margin-bottom:20px; font-weight:600;">Conclusion</p>
+      <h2 style="font-family:'Playfair Display',serif; font-size:clamp(1.7rem,3.2vw,2.8rem); font-weight:900; line-height:1.2; margin-bottom:22px; color:white;">One plant. Endless<br><span style="color:var(--bamboo-light)">environmental value.</span></h2>
+      <div class="accent-line"></div>
+      <p style="font-size:0.96rem; color:rgba(255,255,255,0.65); line-height:1.75; margin-bottom:36px; max-width:600px; margin-left:auto; margin-right:auto;">Bamboo is cheap, fast-growing, and renewable. Through pyrolysis it becomes charcoal and biochar — materials that can clean water, heal soil, fight climate change, and manage waste. Scaling up bamboo-derived carbon production could meaningfully contribute to a greener, circular economy.</p>
+      <div style="display:flex; justify-content:center; gap:28px; flex-wrap:wrap; margin-bottom:36px;">
+        <div style="text-align:center;">
+          <div style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; color:var(--bamboo-light)">74.27%</div>
+          <p style="font-size:0.7rem; color:var(--smoke); margin-top:4px">Best charcoal yield<br>from chopstick bamboo</p>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; color:var(--bamboo-light)">80%</div>
+          <p style="font-size:0.7rem; color:var(--smoke); margin-top:4px">Best biochar yield<br>from D. giganteus</p>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; color:var(--bamboo-light)">10×</div>
+          <p style="font-size:0.7rem; color:var(--smoke); margin-top:4px">More surface area than<br>wood charcoal</p>
+        </div>
+      </div>
+      <div style="background:rgba(74,124,89,0.12); border:1px solid rgba(111,168,130,0.25); border-radius:10px; padding:14px 22px; display:inline-block; font-size:0.86rem; color:rgba(255,255,255,0.7); font-style:italic; line-height:1.6;">
+        Bamboo, a lignocellulosic material, has evolved into several carbon forms — charcoal and biochar — offering versatile environmental benefits across the urban, agricultural, and green-building industries.
+      </div>
+    </div>
+  </div>
+
+</div><!-- end slideshow -->
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="changeSlide(-1)" aria-label="Previous">←</button>
+  <div class="progress-dots" id="dots"></div>
+  <span class="slide-counter" id="counter">1 / 1</span>
+  <button onclick="changeSlide(1)" aria-label="Next">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const dotsEl = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+  document.getElementById('counter').textContent = `1 / ${total}`;
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+  });
+</script>
+</body>
+</html>
